@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -14,56 +13,94 @@
     li { margin-bottom: 0.5rem; }
     .btn { margin-top: 1rem; padding: 0.6rem 1rem; background-color: #007bff; color: white; border: none; cursor: pointer; }
     .btn:hover { background-color: #0056b3; }
-    .highlight { font-weight: bold; color: 	#ff5733; font-size: 28px; }
+    .highlight { font-weight: bold; color: #ff5733; font-size: 28px; }
     .note { background: #f4f4f4; padding: 1rem; border-left: 4px solid #007bff; margin-top: 2rem; }
+    .tab-buttons { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .tab-buttons button { padding: 0.5rem 1rem; border: none; background: #ddd; cursor: pointer; }
+    .tab-buttons button:hover { background: #ccc; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
   </style>
 </head>
 <body>
-  <h2>월급 실지급액 계산</h2>
+  <h2>월급 계산기</h2>
 
-  <div class="note">
-    <h3>📘 사용 가이드 (입력값 안내)</h3>
-    <ul>
-      <li><strong>세전 월급여</strong> : 기본급만 입력 (식대 등 제외)</li>
-      <li><strong>연장근로 시간</strong> : 1.5배 수당 대상 시간 총합 입력</li>
-      <li><strong>시급</strong> : 월급 ÷ 209 기준 계산 후 입력</li>
-      <li><strong>부양가족 수</strong> : 본인 포함 인원 수 입력</li>
-      <li><strong>식대 비과세 제외</strong> : 체크 시 식대 비과세 금액(164,000원) 제외하고 과세 계산</li>
-      <li><strong>기준 반기</strong> : 2025년 하반기부터 연금 상·하한액 변경 반영됨</li>
-    </ul>
-    <p style="font-size: 14px; color: #444;">
-      ※ 실제 지급액과는 근로소득공제/정밀세율 차이로 인해 
-      <span style="color: red; font-weight: bold;">±1~2% 오차 (약 1만원 내외)</span>
-      가 발생할 수 있습니다.
-    </p>
+  <div class="tab-buttons">
+    <button onclick="showTab('net-pay')">실지급액 추측</button>
+    <button onclick="showTab('salary-calc')">세전연봉 → 월급/시급</button>
   </div>
 
-  <label>세전 월급여 (원)</label>
-  <input type="number" id="income" placeholder="">
+  <!-- 실지급액 추측 탭 -->
+  <div id="net-pay" class="tab-content active">
+    <div class="note">
+      <h3>📘 사용 가이드 (입력값 안내)</h3>
+      <ul>
+        <li><strong>세전 월급여</strong> : 기본급만 입력 (식대 등 제외)</li>
+        <li><strong>연장근로 시간</strong> : 1.5배 수당 대상 시간 총합 입력</li>
+        <li><strong>시급</strong> : 월급 ÷ 209 기준 계산 후 입력</li>
+        <li><strong>부양가족 수</strong> : 본인 포함 인원 수 입력</li>
+        <li><strong>식대 비과세 제외</strong> : 체크 시 식대 비과세 금액(164,000원) 제외하고 과세 계산</li>
+        <li><strong>기준 반기</strong> : 2025년 하반기부터 연금 상·하한액 변경 반영됨</li>
+      </ul>
+      <p style="font-size: 14px; color: #444;">
+        ※ 실제 지급액과는 근로소득공제/정밀세율 차이로 인해 
+        <span style="color: red; font-weight: bold;">±1~2% 오차 (약 1만원 내외)</span>
+        가 발생할 수 있습니다.
+      </p>
+    </div>
 
-  <label>연장근로 시간 (시간)</label>
-  <input type="number" id="ot" placeholder="">
+    <label>세전 월급여 (원)</label>
+    <input type="number" id="income" placeholder="">
 
-  <label>시급 (필수 입력)</label>
-  <input type="number" id="customHourly" placeholder="">
+    <label>연장근로 시간 (시간)</label>
+    <input type="number" id="ot" placeholder="">
 
-  <label>부양가족 수</label>
-  <input type="number" id="dep" placeholder="">
+    <label>시급 (필수 입력)</label>
+    <input type="number" id="customHourly" placeholder="">
 
-  <label>식대 비과세 제외</label>
-  <input type="checkbox" id="taxfree" checked>
+    <label>부양가족 수</label>
+    <input type="number" id="dep" placeholder="">
 
-  <label>기준 반기</label>
-  <select id="half">
-    <option value="1H">2025년 1~6월</option>
-    <option value="2H">2025년 7~12월</option>
-  </select>
+    <label>식대 비과세 제외</label>
+    <input type="checkbox" id="taxfree" checked>
 
-  <button class="btn" onclick="calculate()">계산하기</button>
+    <label>기준 반기</label>
+    <select id="half">
+      <option value="1H">2025년 1~6월</option>
+      <option value="2H">2025년 7~12월</option>
+    </select>
 
-  <div id="result"></div>
+    <button class="btn" onclick="calculate()">계산하기</button>
+    <div id="result"></div>
+  </div>
+
+  <!-- 연봉 → 월급/시급 계산기 탭 -->
+  <div id="salary-calc" class="tab-content">
+    <h3>세전 연봉 → 월급 / 시급 계산기</h3>
+    <label>세전 연봉 (원)</label>
+    <input type="number" id="annual" placeholder="예: 50,000,000">
+
+    <button class="btn" onclick="convertSalary()">계산하기</button>
+    <ul id="salary-result"></ul>
+  </div>
 
   <script>
+    function showTab(id) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function convertSalary() {
+      const annual = parseInt(document.getElementById("annual").value || "0");
+      const monthly = Math.floor(annual / 12);
+      const hourly = Math.round(monthly / 209);
+
+      document.getElementById("salary-result").innerHTML = `
+        <li><strong>세전 월급여</strong> : ${monthly.toLocaleString()} 원</li>
+        <li><strong>시급 (209 기준)</strong> : ${hourly.toLocaleString()} 원</li>
+      `;
+    }
+
     function calculate() {
       const income = parseInt(document.getElementById("income").value || "0");
       const ot = parseFloat(document.getElementById("ot").value || "0");
