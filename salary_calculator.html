@@ -1,0 +1,127 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>급여명세서 4대보험 계산기 (중립 버전)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 2rem auto; padding: 1rem; }
+    h2, h3 { font-size: 1.4rem; margin-top: 1.5rem; }
+    label { display: block; margin-top: 1rem; }
+    input, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
+    ul { margin-top: 1rem; padding-left: 1.2rem; }
+    li { margin-bottom: 0.5rem; }
+    .btn { margin-top: 1rem; padding: 0.6rem 1rem; background-color: #007bff; color: white; border: none; cursor: pointer; }
+    .btn:hover { background-color: #0056b3; }
+    .highlight { font-weight: bold; color: green; }
+    .note { background: #f4f4f4; padding: 1rem; border-left: 4px solid #007bff; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+  <h2>급여명세서 4대보험 계산기</h2>
+
+  <div class="note">
+    <h3>📘 사용 가이드 (입력값 안내)</h3>
+    <ul>
+      <li><strong>세전 월급여</strong>: 기본급만 입력 (식대 등 제외)</li>
+      <li><strong>연장근로 시간</strong>: 1.5배 수당 대상 시간 총합 입력</li>
+      <li><strong>시급</strong>: 월급 ÷ 209 기준 계산 후 입력</li>
+      <li><strong>부양가족 수</strong>: 본인 포함 인원 수 입력</li>
+      <li><strong>식대 비과세 제외</strong>: 체크 시 식대 비과세 금액(164,000원) 제외하고 과세 계산</li>
+      <li><strong>기준 반기</strong>: 2025년 하반기부터 연금 상·하한액 변경 반영됨</li>
+    </ul>
+    <p>※ 실제 지급액과는 근로소득공제/정밀세율 차이로 인해 ±1~2% 오차가 발생할 수 있습니다.</p>
+  </div>
+
+  <label>세전 월급여 (원)</label>
+  <input type="number" id="income" placeholder="">
+
+  <label>연장근로 시간 (시간)</label>
+  <input type="number" id="ot" placeholder="">
+
+  <label>시급 (필수 입력)</label>
+  <input type="number" id="customHourly" placeholder="">
+
+  <label>부양가족 수</label>
+  <input type="number" id="dep" placeholder="">
+
+  <label>식대 비과세 제외</label>
+  <input type="checkbox" id="taxfree" checked>
+
+  <label>기준 반기</label>
+  <select id="half">
+    <option value="1H">2025년 1~6월</option>
+    <option value="2H">2025년 7~12월</option>
+  </select>
+
+  <button class="btn" onclick="calculate()">계산하기</button>
+
+  <div id="result"></div>
+
+  <script>
+    function calculate() {
+      const income = parseInt(document.getElementById("income").value || "0");
+      const ot = parseFloat(document.getElementById("ot").value || "0");
+      const customHourly = parseFloat(document.getElementById("customHourly").value || "0");
+      const dep = parseInt(document.getElementById("dep").value || "1");
+      const excludeTaxFree = document.getElementById("taxfree").checked;
+      const half = document.getElementById("half").value;
+
+      const taxFree = excludeTaxFree ? 164000 : 0;
+      const baseIncome = Math.floor(income / 1000) * 1000;
+      const taxableIncome = Math.max(baseIncome - taxFree, 0);
+
+      const caps = half === "2H" ? {
+        pension: { min: 400000, max: 6370000 },
+        health: { min: 400000, max: 6370000 },
+        employment: { min: 400000, max: 8000000 }
+      } : {
+        pension: { min: 390000, max: 6170000 },
+        health: { min: 390000, max: 6170000 },
+        employment: { min: 390000, max: 8000000 }
+      };
+
+      const cappedPension = Math.min(Math.max(baseIncome, caps.pension.min), caps.pension.max);
+      const pension = Math.round(cappedPension * 0.045);
+
+      const cappedHealth = Math.min(Math.max(baseIncome, caps.health.min), caps.health.max);
+      const health = Math.round(cappedHealth * 0.03545);
+      const care = Math.round(health * 0.06475);
+
+      const cappedEmployment = Math.min(Math.max(baseIncome, caps.employment.min), caps.employment.max);
+      const employment = Math.round(cappedEmployment * 0.009);
+
+      const hourly = customHourly;
+      const overtimePay = Math.round(hourly * 1.5 * ot);
+
+      const taxBase = Math.max(taxableIncome - dep * 150000, 0);
+      let incomeTax = 0;
+      if (taxBase < 1200000) incomeTax = 0;
+      else if (taxBase < 3000000) incomeTax = Math.round(taxBase * 0.02);
+      else if (taxBase < 4500000) incomeTax = Math.round(taxBase * 0.05);
+      else if (taxBase < 7000000) incomeTax = Math.round(taxBase * 0.08);
+      else incomeTax = Math.round(taxBase * 0.1);
+
+      const localTax = Math.round(incomeTax * 0.1);
+      const totalDeduction = pension + health + care + employment + incomeTax + localTax;
+      const net = taxableIncome - totalDeduction + overtimePay;
+
+      document.getElementById("result").innerHTML = `
+        <ul>
+          <li>기준소득: ${baseIncome.toLocaleString()}원 ${excludeTaxFree ? `(비과세 ${taxFree.toLocaleString()} 제외)` : ""}</li>
+          <li>국민연금: ${pension.toLocaleString()}원</li>
+          <li>건강보험: ${health.toLocaleString()}원</li>
+          <li>장기요양보험: ${care.toLocaleString()}원</li>
+          <li>고용보험: ${employment.toLocaleString()}원</li>
+          <li>소득세: ${incomeTax.toLocaleString()}원</li>
+          <li>지방소득세: ${localTax.toLocaleString()}원</li>
+          <li>연장근로수당: ${overtimePay.toLocaleString()}원</li>
+          <li><strong>총 공제액: ${totalDeduction.toLocaleString()}원</strong></li>
+          <li class="highlight">실지급액: ${net.toLocaleString()}원</li>
+        </ul>
+      `;
+    }
+  </script>
+</body>
+</html>
