@@ -27,8 +27,9 @@
 
   <div class="tab-buttons">
     <button onclick="showTab('net-pay')">실지급액 추측</button>
-    <button onclick="showTab('salary-calc')">세전연봉 → 월급/시급</button>
+    <button onclick="showTab('salary-calc')">기본급/시급 계산기</button>
   </div>
+
 
   <!-- 실지급액 추측 탭 -->
   <div id="net-pay" class="tab-content active">
@@ -92,12 +93,16 @@
 
     function convertSalary() {
       const annual = parseInt(document.getElementById("annual").value || "0");
-      const monthly = Math.floor(annual / 12);
-      const hourly = Math.round(monthly / 209);
 
-      document.getElementById("salary-result").innerHTML = `
-        <li><strong>세전 월급여</strong> : ${monthly.toLocaleString()} 원</li>
-        <li><strong>시급 (209 기준)</strong> : ${hourly.toLocaleString()} 원</li>
+      const taxFreeAnnual = 164000 * 12; // 식대 연 1,968,000원
+      const baseAnnual = annual - taxFreeAnnual; // 기본급 연봉
+      const monthly = Math.floor(baseAnnual / 12); // 월급
+      const hourly = Math.round(monthly / 209); // 시급
+
+    document.getElementById("salary-result").innerHTML = `
+      <li><strong>세전 월급여 (기본급 기준)</strong> : ${monthly.toLocaleString()} 원</li>
+      <li><strong>시급 (209 기준)</strong> : ${hourly.toLocaleString()} 원</li>
+      <li style="color: gray;">※ 입력 연봉에서 식대 1,968,000원을 제외한 금액 기준</li>
       `;
     }
 
