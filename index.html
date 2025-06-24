@@ -94,15 +94,15 @@
     function convertSalary() {
       const annual = parseInt(document.getElementById("annual").value || "0");
 
-      const taxFreeAnnual = 164000 * 12; // 식대 연 1,968,000원
-      const baseAnnual = annual - taxFreeAnnual; // 기본급 연봉
-      const monthly = Math.floor(baseAnnual / 12); // 월급
+      const taxFreeAnnual = 164000 * 12; // 식대 1년치
+      const totalAnnual = annual + taxFreeAnnual; // 식대 포함 연봉
+      const monthly = Math.floor(totalAnnual / 12); // 세전 월급여 (식대 포함)
       const hourly = Math.round(monthly / 209); // 시급
 
     document.getElementById("salary-result").innerHTML = `
-      <li><strong>세전 월급여 (기본급 기준)</strong> : ${monthly.toLocaleString()} 원</li>
+      <li><strong>세전 월급여 (식대 포함)</strong> : ${monthly.toLocaleString()} 원</li>
       <li><strong>시급 (209 기준)</strong> : ${hourly.toLocaleString()} 원</li>
-      <li style="color: gray;">※ 입력 연봉에서 식대 1,968,000원을 제외한 금액 기준</li>
+      <li style="color: gray;">※ 입력한 기본급 연봉 + 식대 1,968,000원 포함 기준</li>
       `;
     }
 
