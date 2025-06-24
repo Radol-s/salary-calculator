@@ -14,7 +14,7 @@
     li { margin-bottom: 0.5rem; }
     .btn { margin-top: 1rem; padding: 0.6rem 1rem; background-color: #007bff; color: white; border: none; cursor: pointer; }
     .btn:hover { background-color: #0056b3; }
-    .highlight { font-weight: bold; color: green; }
+    .highlight { font-weight: bold; color: #2980b9; font-size: 18px; }
     .note { background: #f4f4f4; padding: 1rem; border-left: 4px solid #007bff; margin-top: 2rem; }
   </style>
 </head>
@@ -24,12 +24,12 @@
   <div class="note">
     <h3>📘 사용 가이드 (입력값 안내)</h3>
     <ul>
-      <li><strong>세전 월급여</strong>: 기본급만 입력 (식대 등 제외)</li>
-      <li><strong>연장근로 시간</strong>: 1.5배 수당 대상 시간 총합 입력</li>
-      <li><strong>시급</strong>: 월급 ÷ 209 기준 계산 후 입력</li>
-      <li><strong>부양가족 수</strong>: 본인 포함 인원 수 입력</li>
-      <li><strong>식대 비과세 제외</strong>: 체크 시 식대 비과세 금액(164,000원) 제외하고 과세 계산</li>
-      <li><strong>기준 반기</strong>: 2025년 하반기부터 연금 상·하한액 변경 반영됨</li>
+      <li><strong>세전 월급여</strong> : 기본급만 입력 (식대 등 제외)</li>
+      <li><strong>연장근로 시간</strong> : 1.5배 수당 대상 시간 총합 입력</li>
+      <li><strong>시급</strong> : 월급 ÷ 209 기준 계산 후 입력</li>
+      <li><strong>부양가족 수</strong> : 본인 포함 인원 수 입력</li>
+      <li><strong>식대 비과세 제외</strong> : 체크 시 식대 비과세 금액(164,000원) 제외하고 과세 계산</li>
+      <li><strong>기준 반기</strong> : 2025년 하반기부터 연금 상·하한액 변경 반영됨</li>
     </ul>
     <p style="font-size: 14px; color: #444;">
       ※ 실제 지급액과는 근로소득공제/정밀세율 차이로 인해 
@@ -113,16 +113,16 @@
 
       document.getElementById("result").innerHTML = `
         <ul>
-          <li>기준소득: ${baseIncome.toLocaleString()}원 ${excludeTaxFree ? `(비과세 ${taxFree.toLocaleString()} 제외)` : ""}</li>
-          <li>국민연금: ${pension.toLocaleString()}원</li>
-          <li>건강보험: ${health.toLocaleString()}원</li>
-          <li>장기요양보험: ${care.toLocaleString()}원</li>
-          <li>고용보험: ${employment.toLocaleString()}원</li>
-          <li>소득세: ${incomeTax.toLocaleString()}원</li>
-          <li>지방소득세: ${localTax.toLocaleString()}원</li>
-          <li>연장근로수당: ${overtimePay.toLocaleString()}원</li>
-          <li><strong>총 공제액: ${totalDeduction.toLocaleString()}원</strong></li>
-          <li class="highlight">실지급액: ${net.toLocaleString()}원</li>
+          <li>기준소득 : ${baseIncome.toLocaleString()}원 ${excludeTaxFree ? `(비과세 ${taxFree.toLocaleString()} 제외)` : ""}</li>
+          <li>국민연금 : ${pension.toLocaleString()}원</li>
+          <li>건강보험 : ${health.toLocaleString()}원</li>
+          <li>장기요양보험 : ${care.toLocaleString()}원</li>
+          <li>고용보험 : ${employment.toLocaleString()}원</li>
+          <li>소득세 : ${incomeTax.toLocaleString()}원</li>
+          <li>지방소득세 : ${localTax.toLocaleString()}원</li>
+          <li>연장근로수당 : ${overtimePay.toLocaleString()}원</li>
+          <li><strong>총 공제액 : ${totalDeduction.toLocaleString()}원</strong></li>
+          <li class="highlight">실지급액 : ${net.toLocaleString()}원</li>
         </ul>
       `;
     }
